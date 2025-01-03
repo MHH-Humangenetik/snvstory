@@ -1,31 +1,16 @@
-FROM continuumio/miniconda3:4.8.2
+# Use python 3.9 slim as the base image
+FROM python:3.9-slim-bookworm
 
-LABEL container.base.image="continuumio/miniconda3:4.8.2" \
-      software.name="IGM Churchill Ancestry" \
-      software.version="3.0.2"
+# IUnstall uv (https://docs.astral.sh/uv/)
+COPY --from=ghcr.io/astral-sh/uv:0.5.13 /uv /uvx /bin/
 
-# install system requirements so these can potentially be cached
-ENV NUMBA_VERSION="0.48" PATH="/opt/conda/bin:$PATH"
-RUN conda install -y \
-      -c conda-forge \
-      matplotlib=3.2.1 xgboost=1.0.2  \
-      pandas=1.0.1 numpy=1.18.1 \
-      scipy=1.4.1 umap-learn=0.4.2 \
-      scikit-learn=0.24.1 \
-      bokeh=2.4.3 && \
-      # clean up
-      conda clean --all
+# Install the tool and required dependencies
+COPY . /app/
+WORKDIR /app
+RUN uv sync --frozen --no-dev --compile-bytecode
 
-# install the application requirements to cache
-ARG SERVICE_NAME=Ancestry
-WORKDIR /opt/${SERVICE_NAME}
-COPY ./requirements.txt ./
-RUN pip install -r requirements.txt
-RUN rm requirements.txt
+# Add the virtualenv at the front of the PATH to ensure using the correct Python version
+ENV PATH="/app/.venv/bin:$PATH"
 
-# copy source code
-COPY ./igm_churchill_ancestry ./igm_churchill_ancestry
-
-ENTRYPOINT ["python3", "-m", "igm_churchill_ancestry"]
-
-ENV TMP_DIR=/data
+# default to running the tool
+CMD ["uv", "run", "python", "igm_churchill_ancestry", " --resource", "./resource_dir"]
