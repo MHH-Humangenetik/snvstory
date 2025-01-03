@@ -1,3 +1,4 @@
+resource_dir/
 assets/
 .venv/
 __pycache__/

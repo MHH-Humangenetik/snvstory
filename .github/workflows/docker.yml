@@ -17,19 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache resources
-        id: cache-resources
-        uses: actions/cache@v4
-        with:
-          path: resource_dir
-          key: ${{ runner.os }}-resource_dir-${{ hashFiles('resource_dir/**') }}
-      
-      - name: Download resources
-        if: steps.cache-resources.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p resource_dir
-          aws s3 sync s3://igm-public-dropbox/snvstory/resource_dir/ ./resource_dir/ --no-sign-request
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5

@@ -13,4 +13,4 @@ RUN uv sync --frozen --no-dev --compile-bytecode
 ENV PATH="/app/.venv/bin:$PATH"
 
 # default to running the tool
-CMD ["uv", "run", "python", "igm_churchill_ancestry", " --resource", "./resource_dir"]
+CMD ["uv", "run", "python", "igm_churchill_ancestry"]
