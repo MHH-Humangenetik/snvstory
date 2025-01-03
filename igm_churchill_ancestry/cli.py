@@ -94,8 +94,12 @@ def run_ancestry():
     # setup directories
     DATA_DIR = setup_workspace()
     INPUT_DIR = f"{DATA_DIR}/input/"
-    LOGGING_FILE = f"{DATA_DIR}/logging.txt"
+    if args.logging:
+        LOGGING_FILE = os.path.join(args.logging, "logging.txt")
+    else:
+        LOGGING_FILE = f"{DATA_DIR}/logging.txt"
     logging.basicConfig(filename=LOGGING_FILE, level=logging.DEBUG, format="%(asctime)s:%(levelname)s:%(message)s")
+    logging.debug(f"Data directory: {DATA_DIR}")
     RSRC_DIR = f"{DATA_DIR}/resources/"
     os.makedirs(RSRC_DIR)
     OUT_DIR = f"/{DATA_DIR}/output/"
@@ -148,7 +152,7 @@ def run_ancestry():
         local_vcf_dir = filter_extension(local_vcf_dir)
         if len(args.sp) != len(local_vcf_dir):
             if args.sp != 'all':
-                print(f"Length of 'sample_pos' is not equal to the number of relevant input VCFs. Analyzing all samples.")
+                print("Length of 'sample_pos' is not equal to the number of relevant input VCFs. Analyzing all samples.")
             sp = ['all'] * len(local_vcf_dir)
         else:
             sp = args.sp
@@ -174,18 +178,16 @@ def run_ancestry():
             ofn = f"{os.path.splitext(local_vcf_file)[0].split('/')[-1]}_{sample_name[0]}.csv"
         else:
             ofn = args.output_filename
-
+        logging.debug(f"Output file name: {ofn}")
         run_ancestry_pipeline(vcf_path=local_vcf_file, multi_sample_status=multi_sample_status,
                               sample=sample_name, sample_position=args.sp, var=var,
                               outdir=OUT_DIR, genome_ver=args.genome_ver, mode=args.mode[0],
                               ofn=ofn)
         flex_output(OUT_DIR, args.output_dir)
 
-    logging.debug(f"Completed")
+    logging.debug("Completed")
     try:
         if args.logging:
             flex_output(LOGGING_FILE, args.logging)
     except Exception:
         pass
-
-
