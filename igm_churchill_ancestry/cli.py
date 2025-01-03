@@ -3,7 +3,6 @@ import uuid
 import logging
 import tempfile
 import argparse
-import concurrent.futures
 
 from igm_churchill_ancestry.pipelines.variables import variables
 from igm_churchill_ancestry.utilities.flex import flex_input, flex_output
